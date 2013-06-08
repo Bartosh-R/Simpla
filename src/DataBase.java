@@ -20,9 +20,12 @@ public class DataBase {
 	Vector<String> FileNames;
 	static ArrayList<Record> Records;
 	static int currentRecord;
-
+	
+	static File patho = new File("C:\\Users\\Bartosz\\Documents");
+	static String FILE_NAME = "file.dat";
+	
     public DataBase() {
-    	File path = new File(".");
+    	File path = new File("C:\\Users\\Bartosz\\Documents");
     	String list[];
     	list = path.list(new DirFiler(".*?.dat"));
     	for(int i = 0; i < list.length; i++)
@@ -33,7 +36,7 @@ public class DataBase {
     }
  
     public static boolean loadFiles()  {
-    	Records = select("file.dat");
+    	Records = select(FILE_NAME);
     	return true;
     }
  
@@ -50,10 +53,10 @@ public class DataBase {
 		return result;
     }
     
-    public static boolean insert(String question, String answer){
+    public static boolean insert(String question, String answer, String FileName){
         FileWriter fw;
 		try {
-			fw = new FileWriter("file.dat",true);
+			fw = new FileWriter(patho.getAbsolutePath()+"\\"+FileName,true);
 		       fw.write(question + "^" + answer+"\n");
 		        fw.close();
 		} catch (IOException e) {
@@ -63,9 +66,9 @@ public class DataBase {
         return true;
     }
     
-    public static void erase(String question, String answer, String path)
+    public static void erase(String question, String answer, String fileName)
     {
-    	String c = getFileString(path);
+    	String c = getFileString(patho.getAbsolutePath()+"\\"+fileName);
     	String replace = question+"^"+answer+"\n";
     	int start = c.indexOf(replace);
     	
@@ -75,7 +78,7 @@ public class DataBase {
     	
         FileWriter fw;
 		try {
-			fw = new FileWriter("file.dat",false);
+			fw = new FileWriter(patho.getAbsolutePath()+"\\"+fileName,false);
 		       fw.write(c.substring(0,start)+c.substring(start+replace.length()));
 		       System.out.println(c.substring(0,start));
 		        fw.close();
@@ -112,11 +115,11 @@ public class DataBase {
     }
     
     
-    public static ArrayList<Record> select(String path) {
+    public static ArrayList<Record> select(String fileName) {
         ArrayList<Record> records = new ArrayList<Record>();
         BufferedReader br;
 		try {
-			br = new BufferedReader(new FileReader(path));
+			br = new BufferedReader(new FileReader(patho.getAbsolutePath()+"\\"+fileName));
 			String current;
 			String question;
 			String answer;

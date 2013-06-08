@@ -134,7 +134,7 @@ public class Add_Window extends JPanel implements ListSelectionListener {
             }
   
             listModel.insertElementAt(question+" - "+answer, index);
-            DataBase.insert(question, answer);
+            DataBase.insert(question, answer, "file.dat");
             
             //If we just wanted to add to the end, we'd do this:
             //listModel.addElement(employeeName.getText());
