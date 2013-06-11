@@ -2,8 +2,10 @@
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.BadLocationException;
@@ -27,7 +29,6 @@ public class Add_Window extends JPanel implements ListSelectionListener {
     public Add_Window() {
         super(new BorderLayout());
 
-        //listModel = new DefaultListModel<String>();
         listModel = DataBase.toArray();
 
         //Create the list and put it in a scroll pane.
@@ -66,13 +67,18 @@ public class Add_Window extends JPanel implements ListSelectionListener {
 
         add(listScrollPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
+        
+        try {
+			f.setIconImage(ImageIO.read(getClass().getResource("img/bu16.png")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     class FireListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            //This method can be called only if
-            //there's a valid selection
-            //so go ahead and remove whatever's selected.
+
             int index = list.getSelectedIndex();
             
             String p = listModel.get(index);

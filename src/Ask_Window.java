@@ -25,7 +25,7 @@ import model.Record;
 
 public class Ask_Window {
 
-	   public  JFrame f = new JFrame("SIMPLA");
+	   public static JFrame f = new JFrame("SIMPLA");
    		public  Label label = new Label("Question here");
    		
 
@@ -50,8 +50,7 @@ public class Ask_Window {
 	        addLabel(f.getContentPane());
 	        
 	        f.pack();
-
-	        
+  
 	    }
 
 	    public  void addLabel(Container pane) {
@@ -81,6 +80,7 @@ public class Ask_Window {
 				public void mouseClicked(MouseEvent e) {
 					if (e.getSource() == label) {
 						int n = DataBase.currentRecord;
+						
 						String answer = DataBase.Records.get(n).getAnswer();
 						if(label.getText().compareTo(answer) != 0)
 						{

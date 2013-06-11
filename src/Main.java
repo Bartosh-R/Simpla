@@ -15,6 +15,7 @@ import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import model.Record;
@@ -22,12 +23,16 @@ import model.Record;
 
 public class Main implements Runnable {
 
+	// TrayIcon menu elements
 	public PopupMenu popup = new PopupMenu();
 	public MenuItem addItem = new MenuItem("Add");
     public MenuItem startItem = new MenuItem("Start");
     
-    public Timer timer = new Timer( ); 
+    // Window
+	public Ask_Window askWindow = new Ask_Window();
     
+	//Engine Bruuum ....Bruum ;-)
+    public Timer timer = new Timer( ); 
     private Boolean is_run = false;
     
 	
@@ -35,22 +40,10 @@ public class Main implements Runnable {
 
 		final Main main = new Main();
 		SwingUtilities.invokeLater(main);
-
-		DataBase b = new DataBase();
+		DataBase base = new DataBase();
 		
 	}
 
-	
-	protected static Image createImage(String path, String description) {
-        URL imageURL = Main.class.getResource(path);
-         
-        if (imageURL == null) {
-            System.err.println("Resource not found: " + path);
-            return null;
-        } else {
-            return (new ImageIcon(imageURL, description)).getImage();
-        }
-    }
 	
 	public void setMenu()
     {
@@ -59,14 +52,20 @@ public class Main implements Runnable {
         
         addItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	System.out.println("ADD");
             	Add_Window.go();
             }
         });
         
         startItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startAsk();
+            	if(!DataBase.Records.isEmpty())
+            	{
+            	startAsk();
+            	}
+            	else
+            	{
+            		JOptionPane.showMessageDialog(Ask_Window.f, "You have to add cards");
+            	}
             }
         });
     }
@@ -104,16 +103,14 @@ public class Main implements Runnable {
 	{
 		if(is_run == false)
 		{
-		final Ask_Window se = new Ask_Window();
-		se.go();
-		//	if(timer == null) System.out.print("EEEEEE .... Working bad");
+		askWindow.go();
         	timer.schedule(new TimerTask() {
 			
 			@Override
 			public void run() {
 				System.out.println("ASK_WINDOW");
-				se.label.setText(DataBase.getRandom().getQuestion());
-				se.f.setVisible(true);
+				askWindow.label.setText(DataBase.getRandom().getQuestion());
+				askWindow.f.setVisible(true);
 			}
         	}, 0,5*60*1000);
         	is_run = true;

@@ -166,6 +166,8 @@ public class DataBase {
 			
 			if(n == 1) return 0;
 			
+			System.out.print(" N = "+n);
+			
 			 int c = super.nextInt(n);
 			 if(c == noagain) 
 				 {
