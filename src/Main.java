@@ -1,5 +1,6 @@
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -27,6 +28,7 @@ public class Main implements Runnable {
 	public PopupMenu popup = new PopupMenu();
 	public MenuItem addItem = new MenuItem("Add");
     public MenuItem startItem = new MenuItem("Start");
+
     
     // Window
 	public Ask_Window askWindow = new Ask_Window();
@@ -64,7 +66,7 @@ public class Main implements Runnable {
             	}
             	else
             	{
-            		JOptionPane.showMessageDialog(Ask_Window.f, "You have to add cards");
+            		//JOptionPane.showMessageDialog(Ask_Window., "You have to add cards");
             	}
             }
         });
@@ -103,14 +105,18 @@ public class Main implements Runnable {
 	{
 		if(is_run == false)
 		{
-		askWindow.go();
+
+                 askWindow.setBackground(new Color(0, 0, 0));
+                 askWindow.setOpacity(0.8f);
+             askWindow.setVisible(true);
+             
         	timer.schedule(new TimerTask() {
 			
 			@Override
 			public void run() {
 				System.out.println("ASK_WINDOW");
-				askWindow.label.setText(DataBase.getRandom().getQuestion());
-				askWindow.f.setVisible(true);
+				askWindow.display.setText(DataBase.getRandom().getQuestion());
+				askWindow.setVisible(true);
 			}
         	}, 0,5*60*1000);
         	is_run = true;
