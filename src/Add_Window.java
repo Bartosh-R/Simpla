@@ -24,7 +24,7 @@ public class Add_Window extends JPanel implements ListSelectionListener {
     private static final String fireString = "Delete";
     private JButton fireButton;
     private JButton hireButton;
-    private JTextField addField;
+    private static JTextField addField;
 
     public Add_Window() {
         super(new BorderLayout());
@@ -236,6 +236,9 @@ public class Add_Window extends JPanel implements ListSelectionListener {
         //Display the window.
         f.pack();
         f.setVisible(true);
+        
+        // To fastest write 
+        addField.requestFocus();
     }
 
 }

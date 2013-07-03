@@ -21,6 +21,10 @@ import javax.swing.SwingUtilities;
 
 import model.Record;
 
+import com.dstjacques.jhotkeys.JHotKeys;
+import com.dstjacques.jhotkeys.JHotKeyListener;
+import com.melloware.jintellitype.JIntellitype;
+
 
 public class Main implements Runnable {
 
@@ -28,7 +32,8 @@ public class Main implements Runnable {
 	public PopupMenu popup = new PopupMenu();
 	public MenuItem addItem = new MenuItem("Add");
     public MenuItem startItem = new MenuItem("Start");
-
+    
+    
     
     // Window
 	public Ask_Window askWindow = new Ask_Window();
@@ -43,6 +48,20 @@ public class Main implements Runnable {
 		final Main main = new Main();
 		SwingUtilities.invokeLater(main);
 		DataBase base = new DataBase();
+		
+		JHotKeys hotkeys = new JHotKeys("../lib");
+	    hotkeys.registerHotKey(0, JIntellitype.MOD_CONTROL, (int)'X');
+	    
+	    JHotKeyListener hotkeyListener = new JHotKeyListener(){
+	         public void onHotKey(int id) {
+	            if(id == 0)
+	            {
+	            	Add_Window.go();
+	            }
+	         }
+	      };
+
+	      hotkeys.addHotKeyListener(hotkeyListener);
 		
 	}
 
@@ -105,9 +124,8 @@ public class Main implements Runnable {
 	{
 		if(is_run == false)
 		{
-
-                 askWindow.setBackground(new Color(0, 0, 0));
-                 askWindow.setOpacity(0.8f);
+			 askWindow.setBackground(new Color(0, 0, 0));
+             askWindow.setOpacity(0.8f);
              askWindow.setVisible(true);
              
         	timer.schedule(new TimerTask() {
