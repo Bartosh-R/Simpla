@@ -21,9 +21,12 @@ import javax.swing.SwingUtilities;
 
 import model.Record;
 
+
+
 import com.dstjacques.jhotkeys.JHotKeys;
 import com.dstjacques.jhotkeys.JHotKeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import com.sun.jna.platform.win32.User32;
 
 
 public class Main implements Runnable {
@@ -33,14 +36,14 @@ public class Main implements Runnable {
 	public MenuItem addItem = new MenuItem("Add");
     public MenuItem startItem = new MenuItem("Start");
     
-    
-    
     // Window
 	public Ask_Window askWindow = new Ask_Window();
     
 	//Engine Bruuum ....Bruum ;-)
     public Timer timer = new Timer( ); 
     private Boolean is_run = false;
+    
+    //Class capture selected text
     
 	
 	public static void main(String[] args) {
@@ -50,13 +53,20 @@ public class Main implements Runnable {
 		DataBase base = new DataBase();
 		
 		JHotKeys hotkeys = new JHotKeys("../lib");
-	    hotkeys.registerHotKey(0, JIntellitype.MOD_CONTROL, (int)'X');
+	    hotkeys.registerHotKey(0, JIntellitype.MOD_CONTROL, (int)'Q');
 	    
 	    JHotKeyListener hotkeyListener = new JHotKeyListener(){
 	         public void onHotKey(int id) {
 	            if(id == 0)
 	            {
-	            	Add_Window.go();
+	            	//Add_Window.go();
+	            	try {
+	            		Selector foo = new Selector();
+						Selector.go(foo);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	            }
 	         }
 	      };

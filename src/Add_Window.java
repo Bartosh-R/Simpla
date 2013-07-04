@@ -95,7 +95,7 @@ public class Add_Window extends JPanel implements ListSelectionListener {
 
             int size = listModel.getSize();
 
-            if (size == 0) { //Nobody's left, disable firing.
+            if (size == 0) { //Nothing's left, disable firing.
                 fireButton.setEnabled(false);
 
             } else { //Select an index.
@@ -143,7 +143,7 @@ public class Add_Window extends JPanel implements ListSelectionListener {
             DataBase.insert(question, answer, "file.dat");
             
             //If we just wanted to add to the end, we'd do this:
-            //listModel.addElement(employeeName.getText());
+            //listModel.addElement(question+" - "+answer);
 
             //Reset the text field.
             addField.requestFocusInWindow();
@@ -154,9 +154,7 @@ public class Add_Window extends JPanel implements ListSelectionListener {
             list.ensureIndexIsVisible(index);
         }
 
-        //This method tests for string equality. You could certainly
-        //get more sophisticated about the algorithm.  For example,
-        //you might want to ignore white space and capitalization.
+        //This method tests whether or not given string is on a list 
         protected boolean alreadyInList(String name) {
             return listModel.contains(name);
         }
@@ -185,7 +183,6 @@ public class Add_Window extends JPanel implements ListSelectionListener {
         public void changedUpdate(DocumentEvent e) {
         		
         }
-
 
         private boolean check(String s) {
         	Pattern p = Pattern.compile(".*?/.*?");
