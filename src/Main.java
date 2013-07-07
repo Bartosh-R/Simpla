@@ -30,6 +30,9 @@ import com.sun.jna.platform.win32.User32;
 
 
 public class Main implements Runnable {
+	
+	//Address - translator database
+	private static String url = "http://portalwiedzy.onet.pl/tlumacz.html?qs=";
 
 	// TrayIcon menu elements
 	public PopupMenu popup = new PopupMenu();
@@ -43,7 +46,6 @@ public class Main implements Runnable {
     public Timer timer = new Timer( ); 
     private Boolean is_run = false;
     
-    //Class capture selected text
     
 	
 	public static void main(String[] args) {
@@ -61,8 +63,10 @@ public class Main implements Runnable {
 	            {
 	            	//Add_Window.go();
 	            	try {
-	            		Selector foo = new Selector();
-						Selector.go(foo);
+	            		Selector foo = new Selector();				
+						Extractor ext = new Extractor(url+Selector.go(foo));
+						System.out.print(ext.subjects.toString());
+						
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

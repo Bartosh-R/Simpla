@@ -1,15 +1,16 @@
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
 
-import com.sun.jna.Native;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.win32.StdCallLibrary;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.Native;
+
 
 public class Selector implements ClipboardOwner {
 	
@@ -63,8 +64,8 @@ public class Selector implements ClipboardOwner {
         return text;
     }
 
-    public static void go(Selector foo) throws Exception {
+    public static String go(Selector foo) throws Exception {
     	
-        System.out.println(foo.getSelectedText(User32.INSTANCE, CustomUser32.INSTANCE));
+      return foo.getSelectedText(User32.INSTANCE, CustomUser32.INSTANCE);
     }
 }
