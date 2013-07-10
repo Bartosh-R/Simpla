@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,7 +34,8 @@ import com.sun.jna.platform.win32.User32;
 public class Main implements Runnable {
 	
 	//Address - translator database
-	private static String url = "http://portalwiedzy.onet.pl/tlumacz.html?qs=";
+	static String url = "http://pl.bab.la/slownik/angielski-polski/";;
+	
 
 	// TrayIcon menu elements
 	public PopupMenu popup = new PopupMenu();
@@ -40,7 +43,8 @@ public class Main implements Runnable {
     public MenuItem startItem = new MenuItem("Start");
     
     // Window
-	public Ask_Window askWindow = new Ask_Window();
+	public static Ask_Window askWindow = new Ask_Window();
+	public static Tip_Window tipWindow = new Tip_Window();
     
 	//Engine Bruuum ....Bruum ;-)
     public Timer timer = new Timer( ); 
@@ -57,15 +61,28 @@ public class Main implements Runnable {
 		JHotKeys hotkeys = new JHotKeys("../lib");
 	    hotkeys.registerHotKey(0, JIntellitype.MOD_CONTROL, (int)'Q');
 	    
+
+         
+	    
 	    JHotKeyListener hotkeyListener = new JHotKeyListener(){
 	         public void onHotKey(int id) {
 	            if(id == 0)
 	            {
-	            	//Add_Window.go();
 	            	try {
 	            		Selector foo = new Selector();				
-						Extractor ext = new Extractor(url+Selector.go(foo));
-						System.out.print(ext.subjects.toString());
+						Extractor ext = new Extractor(url+URLEncoder.encode(Selector.go(foo), "UTF-8"),null);
+
+						//extracting data 
+						ext.define("icon-chevron-right", "fb-like-wrapper");
+						ArrayList<String> elements = ext.extract("class=\"muted-link\">.*?</a");
+						
+						
+						 tipWindow.setBackground(new Color(0, 0, 0));
+				         tipWindow.setOpacity(0.8f);
+				         
+						tipWindow.display.setText(elements.get(0));
+						tipWindow.setVisible(true);
+
 						
 					} catch (Exception e) {
 						// TODO Auto-generated catch block

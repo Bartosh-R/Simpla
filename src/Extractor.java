@@ -5,62 +5,88 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+// This is what makes me good candidate for hell
+
 public class Extractor {
 
 	String myString;
-	
-	ArrayList<String> subjects;
-	
 	ArrayList<String> forbidden;
-	ArrayList<Integer> hole;
 	
 	
-	public Extractor(String uri) {
-		myString = urlGet(uri);
+	
+	public Extractor(String uri, String charset) {
+		myString = urlGet(uri, charset);	
 		forbidden = new ArrayList<String>();
-		forbidden.add(".*?</I>.*?");
-		subjects = extract();
-		
-		if(subjects.size() == 0) // if can't match by default setting
-		{
-			String thing = find("class=\"a1 result\">.*?</div>", 18, 0);
-			String r = find("<BR>.*?</div>", thing, 4, -6);
-			subjects.add(r);
-		}
 	}
 	
+	public void define(String pattern, int start, int stop)
+	{
+		myString = find(pattern,myString, start, stop);
+	}
+	
+	public void define(String start, String stop)
+	{
+		System.out.println(myString.length());
+		int begin = myString.indexOf(start);
+		int end = myString.indexOf(stop,begin+start.length());
+		myString = myString.substring(begin,end);
+	}
 
 	
-    public ArrayList<String> extract()
+    public ArrayList<String> extract_dbl(String p1,String p2)
     {
     	ArrayList<String> result = new ArrayList<String>();
-    	Pattern p = Pattern.compile("class=\"a1 result\">.*?</div");
-    	Pattern p2 = Pattern.compile("</B>.*?<BR>");
-    	Matcher m  = p.matcher(myString);
+    	Pattern pattern1 = Pattern.compile(p1);
+    	Pattern pattern2 = Pattern.compile(p2);
+    	
+    	int prefix_p1 = p1.indexOf(".*?");
+    	int prefix_p2 = p2.indexOf(".*?");
+    	
+    	int postfix_p1 = (p1.length()-(prefix_p1+3));
+    	int postfix_p2 =(p2.length()-(prefix_p2+3));
+    	
+    	Matcher m  = pattern1.matcher(myString);
     	while(m.find())
     	{
-    		String helper = myString.substring(m.start()+18,m.end());
-    		Matcher m2 = p2.matcher(helper);
+    		String helper = myString.substring(m.start()+prefix_p1,m.end());
+    		Matcher m2 = pattern2.matcher(helper);
     		String wynik = "";
     		int licznik = 0;
     		while(m2.find())
     		{
-    			String x = helper.substring(m2.start()+4,m2.end()-4);
+    			String x = helper.substring(m2.start()+prefix_p2,m2.end()-postfix_p2);
     			if(check_list2(x) == false)result.add(x);
     			licznik++;
-    		}
-    		
+    		}		
+    	}
+		return result;
+    }
+    	
+    
+    public ArrayList<String> extract(String p)
+    {
+    	ArrayList<String> result = new ArrayList<String>();
+    	Pattern pattern1 = Pattern.compile(p);
+    	
+    	int prefix_p = p.indexOf(".*?");
+    	int postfix_p = (p.length()-(prefix_p+3));
+    	
+    	
+    	Matcher m  = pattern1.matcher(myString);
+    	while(m.find())
+    	{
+    		String x = myString.substring(m.start()+prefix_p,m.end()-postfix_p);
+    		if(check_list2(x) == false)result.add(x);
     	}
 		return result;
     }
     
-
-	
     public boolean check_list2(String check)
     {
     	for(String forb: forbidden)
@@ -79,7 +105,7 @@ public class Extractor {
     	m.find();	
     	return myString.substring(m.start()+start,m.end()+stop);
     }
-   
+    
     public String find(String pattern, String base, int start, int stop)
     {  	
     	Pattern p = Pattern.compile(pattern);
@@ -89,65 +115,43 @@ public class Extractor {
     }
  
 	
-	 public String urlGet(String urlString){
-	      
+	 public String urlGet(String urlString,String charset){ 
+		 
+		 if(charset == null) charset = "UTF-8";
+		 
 	     URLConnection urlConnection = null;
-	        URL url = null;
-	        String string = null;
+	     URL url = null;
+	     String string = null;
 	         
 	        try {
-	   url = new URL(urlString);
-	   urlConnection = url.openConnection();
+	        	
+	        	// make connection
+	        	url = new URL(urlString);
+	        	urlConnection = url.openConnection();
 	    
-	   InputStream inputStream = urlConnection.getInputStream();
-	   InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-	   BufferedReader reader = new BufferedReader(inputStreamReader);
+	        	//preparing
+	        	InputStream inputStream = urlConnection.getInputStream();
+	        	InputStreamReader inputStreamReader = new InputStreamReader(inputStream,charset);
+	        	BufferedReader reader = new BufferedReader(inputStreamReader);
 	    
-	       
-	   StringBuffer stringBuffer = new StringBuffer();
+	        	// reading from website
+	        	StringBuffer stringBuffer = new StringBuffer();
+	        	while((string = reader.readLine()) != null){
+	        		stringBuffer.append(string + "\n");
+	        	}
+	        	
+	        	//closing 
+	        	inputStream.close();
+	        	string = stringBuffer.toString();
 	    
-	   while((string = reader.readLine()) != null){
-	    stringBuffer.append(string + "\n");
-	   }
-	   inputStream.close();
 	    
-	   string = stringBuffer.toString();
-	    
-	    
-	  } catch (MalformedURLException e) {
-	   e.printStackTrace();
-	  } catch (IOException e) {
-	   e.printStackTrace();
-	  } 
+	        } catch (MalformedURLException e) {
+	        	e.printStackTrace();
+	        } catch (IOException e) {
+	        	e.printStackTrace();
+	        } 
 	   
 	  return string;
-	    }
-	 
-	 public ArrayList<String> getBaseOfLinks(){
-		 String kopia = myString;
-		   ArrayList<String> baza = new ArrayList<String>();
-		   	 int start = kopia.indexOf("<a href=\"");
-		   	 int stop = kopia.indexOf("\" target");
-		   	 while(start != -1 && stop != -1){
-			   	 baza.add(kopia.substring(start+9,stop));
-			   	 kopia = kopia.substring(stop+8);
-			   	 start = kopia.indexOf("<a href=\"");
-			   	 stop = kopia.indexOf("\" target");
-		   	 }
-		     return baza;
 	 }
-	
-	   public ArrayList<String> getBaseOfNames(){
-		   String kopia = myString;
-		   ArrayList<String> baza = new ArrayList<String>();
-		   	 int start = kopia.indexOf("\"plan\">");
-		   	 int stop = kopia.indexOf("</a>");
-		   	 while(start != -1 && stop != -1){
-			   	 baza.add(kopia.substring(start+7,stop));
-			   	 kopia = kopia.substring(stop+4);
-			   	 start = kopia.indexOf("\"plan\">");
-			   	 stop = kopia.indexOf("</a>");
-		   	 }
-		     return baza;
-		    }  
+	 
 }

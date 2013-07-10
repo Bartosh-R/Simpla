@@ -5,18 +5,18 @@ import java.awt.event.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 
-import javax.naming.ldap.Rdn;
+
 import javax.swing.*;
 
 import java.awt.geom.*;
-import static java.awt.GraphicsDevice.WindowTranslucency.*;
 
-public class Ask_Window extends JFrame {
+
+public class Tip_Window extends JFrame {
 	
-	Label display = new Label("Hakuna matata");
+	 Label display = new Label("Hakuna matata");
    	Font font = new Font("Arial", Font.ITALIC, 35);
 
-    public Ask_Window() {
+    public Tip_Window() {
         super("SIMPLA");
         setDisplay();
 
@@ -62,20 +62,7 @@ public class Ask_Window extends JFrame {
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getSource() == display) {
-					int n = DataBase.currentRecord;
-					String answer = DataBase.Records.get(n).getAnswer();
-					if(display.getText().compareTo(answer) != 0)
-					{
-						display.setText(answer);
-						repaint();
-					}
-					else
-					{
-						setVisible(false);
-					}
-				}
-				
+				setVisible(false);
 			}
 		});
         display.setForeground(new Color(255,255,255));   
@@ -138,10 +125,10 @@ public class Ask_Window extends JFrame {
             Rectangle2D bounds = layout.getBounds();
             
             
-            //System.out.println("Width ->>" + bounds.getWidth());
-            //System.out.print("Heigth ->>" + bounds.getHeight());
+          //  System.out.println("Width ->>" + bounds.getWidth());
+          //  System.out.print("Heigth ->>" + bounds.getHeight());
             
-			setSize(new Dimension((int)bounds.getWidth()+10, (int)bounds.getHeight()+10));
+			setSize(new Dimension((int)bounds.getWidth()+30, (int)bounds.getHeight()+10));
 			super.paint(g);
 		}
 	}
