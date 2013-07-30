@@ -56,6 +56,10 @@ public class DataBase {
     public static boolean insert(String question, String answer, String FileName){
         FileWriter fw;
 		try {
+			
+			question = capitalizeFirst(question);
+			answer = capitalizeFirst(answer);
+			
 			fw = new FileWriter(patho.getAbsolutePath()+"\\"+FileName,true);
 		       fw.write(question + "^" + answer+"\n");
 		        fw.close();
@@ -71,11 +75,7 @@ public class DataBase {
     	String c = getFileString(patho.getAbsolutePath()+"\\"+fileName);
     	String replace = question+"^"+answer+"\n";
     	int start = c.indexOf(replace);
-    	
-    	//System.out.print("?"+c+"?"+replace+"?");
-    	
-    	//System.out.print(c.charAt(0)+"<"+start+">");
-    	
+
         FileWriter fw;
 		try {
 			fw = new FileWriter(patho.getAbsolutePath()+"\\"+fileName,false);
@@ -86,6 +86,14 @@ public class DataBase {
 			e.printStackTrace();
 		}
 
+    }
+    
+    public static void reverse(String question, String answer, String fileName)
+    {
+    	Record rec = new Record(answer,question); // reverted input
+    
+    	erase(question, answer, fileName);
+    	insert(rec.getQuestion(), rec.getAnswer(), fileName);
     }
  
     
@@ -152,6 +160,12 @@ public class DataBase {
     	
     }
     
+    // capitalize first character
+    private static String capitalizeFirst(String line)
+    {
+      return Character.toUpperCase(line.charAt(0)) + line.substring(1);
+    }
+    
    static class Brandom extends Random
     {
     	static int noagain = -1;
@@ -165,9 +179,7 @@ public class DataBase {
 		public int nextInt(int n) {
 			
 			if(n == 1) return 0;
-			
-			System.out.print(" N = "+n);
-			
+					
 			 int c = super.nextInt(n);
 			 if(c == noagain) 
 				 {

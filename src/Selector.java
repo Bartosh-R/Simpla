@@ -5,6 +5,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.platform.win32.WinDef.HWND;
@@ -33,8 +35,18 @@ public class Selector implements ClipboardOwner {
         customUser32.keybd_event((byte) 0x11 /* VK_CONTROL*/, (byte) 0, 2 /* KEYEVENTF_KEYUP */, 0);// 'Left Control Up
     }
 
-    String getClipboardText() throws Exception {
+    String getClipboardText() {
+    	try{
         return (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+    	}
+    	catch(IOException e)
+    	{
+    		return "Error";
+    	}
+    	catch(UnsupportedFlavorException e)
+    	{
+    		return "Error";
+    	}
     }
 
     void setClipboardText(String data) throws Exception {

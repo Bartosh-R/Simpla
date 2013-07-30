@@ -8,7 +8,11 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -34,7 +38,7 @@ import com.sun.jna.platform.win32.User32;
 public class Main implements Runnable {
 	
 	//Address - translator database
-	static String url = "http://pl.bab.la/slownik/angielski-polski/";;
+	static String url = "http://pl.bab.la/slownik/angielski-polski/";
 	
 
 	// TrayIcon menu elements
@@ -48,7 +52,7 @@ public class Main implements Runnable {
     
 	//Engine Bruuum ....Bruum ;-)
     public Timer timer = new Timer( ); 
-    private Boolean is_run = false;
+    public static Boolean is_run = false;
     
     
 	
@@ -57,22 +61,37 @@ public class Main implements Runnable {
 		final Main main = new Main();
 		SwingUtilities.invokeLater(main);
 		DataBase base = new DataBase();
-		
-		JHotKeys hotkeys = new JHotKeys("../lib");
-	    hotkeys.registerHotKey(0, JIntellitype.MOD_CONTROL, (int)'Q');
-	    
 
-         
-	    
+		setHotKeys();
+		
+	}
+	
+	
+	// Main GUI elements 
+	
+
+	public static void setHotKeys()
+	{
+		JHotKeys hotkeys = new JHotKeys("../lib");
+		try {
+		    hotkeys.registerHotKey(0, JIntellitype.MOD_CONTROL, (int)'Q');
+		    
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null,
+				    "Could not load JIntellitype.dll from local file system");
+		}
+		
 	    JHotKeyListener hotkeyListener = new JHotKeyListener(){
 	         public void onHotKey(int id) {
 	            if(id == 0)
 	            {
 	            	try {
-	            		Selector foo = new Selector();				
-						Extractor ext = new Extractor(url+URLEncoder.encode(Selector.go(foo), "UTF-8"),null);
+	            		Selector foo = new Selector();
+	            		String select = URLEncoder.encode(Selector.go(foo), "UTF-8");
+						Extractor ext = new Extractor(url+select,null);
 
 						//extracting data 
+						ext.forbidden.add(".*?<.>.*?");
 						ext.define("icon-chevron-right", "fb-like-wrapper");
 						ArrayList<String> elements = ext.extract("class=\"muted-link\">.*?</a");
 						
@@ -80,7 +99,7 @@ public class Main implements Runnable {
 						 tipWindow.setBackground(new Color(0, 0, 0));
 				         tipWindow.setOpacity(0.8f);
 				         
-						tipWindow.display.setText(elements.get(0));
+						tipWindow.setInfo(elements,select);
 						tipWindow.setVisible(true);
 
 						
@@ -93,9 +112,7 @@ public class Main implements Runnable {
 	      };
 
 	      hotkeys.addHotKeyListener(hotkeyListener);
-		
 	}
-
 	
 	public void setMenu()
     {
@@ -150,33 +167,38 @@ public class Main implements Runnable {
             return;
         }
 	}
+	
+	
 
 	public void startAsk()
 	{
-		if(is_run == false)
+		if(DataBase.Records.size() != 0)
 		{
+			if(is_run == false)
+			{
 			 askWindow.setBackground(new Color(0, 0, 0));
              askWindow.setOpacity(0.8f);
              askWindow.setVisible(true);
              
         	timer.schedule(new TimerTask() {
 			
-			@Override
-			public void run() {
+        		@Override
+        		public void run() {
 				System.out.println("ASK_WINDOW");
 				askWindow.display.setText(DataBase.getRandom().getQuestion());
 				askWindow.setVisible(true);
-			}
-        	}, 0,5*60*1000);
-        	is_run = true;
-			startItem.setLabel("Stop");
-		}
-		else
-		{
-			startItem.setLabel("Start");
-			timer.cancel();
-			timer = new Timer();
-			is_run = false;
+        		}
+        		}, 0,5*60*1000);
+        		is_run = true;
+        		startItem.setLabel("Stop");
+				}
+				else
+				{
+					startItem.setLabel("Start");
+					timer.cancel();
+					timer = new Timer();
+					is_run = false;
+				}
 		}
 	}
 	
@@ -184,6 +206,9 @@ public class Main implements Runnable {
 	public void run() {
 	      setMenu();
 	      setTray();
+	      
+	     // Start-up 
+	      startAsk();
 	}
 
 }

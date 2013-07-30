@@ -10,9 +10,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.BadLocationException;
 
-
-/* ListDemo.java requires no other files. */
 public class Add_Window extends JPanel implements ListSelectionListener {
+	
+	
 	
     private JList<String> list;
     private DefaultListModel<String> listModel;
@@ -35,6 +35,9 @@ public class Add_Window extends JPanel implements ListSelectionListener {
         list = new JList<String>(listModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.addListSelectionListener(this);
+        
+        list.addMouseListener(new ReverseListener());
+        
         JScrollPane listScrollPane = new JScrollPane(list);
 
         hireButton = new JButton(hireString);
@@ -69,11 +72,54 @@ public class Add_Window extends JPanel implements ListSelectionListener {
         add(buttonPane, BorderLayout.PAGE_END);
         
         try {
-			f.setIconImage(ImageIO.read(getClass().getResource("img/bu16.png")));
+        	f.setIconImage(ImageIO.read(getClass().getResource("img/bu32.png")));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+    
+    
+ 
+    class ReverseListener implements MouseListener
+    {
+
+		@Override
+		public void mouseClicked(MouseEvent evt)
+		{
+			JList list = (JList)evt.getSource();
+            if (evt.getClickCount() == 2) {
+            	
+            	int index = list.locationToIndex(evt.getPoint());
+            	
+            	String p = listModel.get(index);
+                String question = p.substring(0,p.indexOf("-")-1);
+                String answer = p.substring(p.indexOf("-")+2);
+                
+                DataBase.reverse(question, answer, "file.dat");
+               
+                listModel.remove(index); 
+                listModel.insertElementAt(answer+" - "+question, index);
+                
+                
+                list.repaint();
+            } 
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {}
+
+		@Override
+		public void mouseExited(MouseEvent e) {}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+    	
     }
 
     class FireListener implements ActionListener {
@@ -107,6 +153,7 @@ public class Add_Window extends JPanel implements ListSelectionListener {
                 list.setSelectedIndex(index);
                 list.ensureIndexIsVisible(index);
             }
+            
         }
     }
 
@@ -202,6 +249,8 @@ public class Add_Window extends JPanel implements ListSelectionListener {
       
     }
 
+    
+    
     //This method is required by ListSelectionListener.
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {
@@ -219,12 +268,14 @@ public class Add_Window extends JPanel implements ListSelectionListener {
 
 
     public static void go() {
+    	
         //Create and set up the window.
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setPreferredSize(new Dimension(501, 220));
         f.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         f.setIconImage((new ImageIcon("img/bu48.png").getImage()));
         f.setLocation((dim.width/2)-200, (dim.height/2)-100);
+        
         //Create and set up the content pane.
         JComponent newContentPane = new Add_Window();
         newContentPane.setOpaque(true); //content panes must be opaque
