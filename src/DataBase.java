@@ -21,11 +21,11 @@ public class DataBase {
 	static ArrayList<Record> Records;
 	static int currentRecord;
 	
-	static File patho = new File("C:\\Users\\Bartosz\\Documents");
+	static File patho = new File(DataBase.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 	static String FILE_NAME = "file.dat";
 	
     public DataBase() {
-    	File path = new File("C:\\Users\\Bartosz\\Documents");
+    	File path = patho;
     	String list[];
     	list = path.list(new DirFiler(".*?.dat"));
     	for(int i = 0; i < list.length; i++)

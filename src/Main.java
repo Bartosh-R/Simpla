@@ -32,14 +32,16 @@ import model.Record;
 import com.dstjacques.jhotkeys.JHotKeys;
 import com.dstjacques.jhotkeys.JHotKeyListener;
 import com.melloware.jintellitype.JIntellitype;
-import com.sun.jna.platform.win32.User32;
+
+import dane.Interpreter;
+
 
 
 public class Main implements Runnable {
 	
 	//Address - translator database
 	static String url = "http://pl.bab.la/slownik/angielski-polski/";
-	
+	static Interpreter inter = new Interpreter("settings.mod");
 
 	// TrayIcon menu elements
 	public PopupMenu popup = new PopupMenu();
@@ -61,6 +63,8 @@ public class Main implements Runnable {
 		final Main main = new Main();
 		SwingUtilities.invokeLater(main);
 		DataBase base = new DataBase();
+		
+		
 
 		setHotKeys();
 		
@@ -88,12 +92,9 @@ public class Main implements Runnable {
 	            	try {
 	            		Selector foo = new Selector();
 	            		String select = URLEncoder.encode(Selector.go(foo), "UTF-8");
-						Extractor ext = new Extractor(url+select,null);
-
-						//extracting data 
-						ext.forbidden.add(".*?<.>.*?");
-						ext.define("icon-chevron-right", "fb-like-wrapper");
-						ArrayList<String> elements = ext.extract("class=\"muted-link\">.*?</a");
+	            		
+						inter.get(select);
+						ArrayList<String> elements = inter.result;
 						
 						
 						 tipWindow.setBackground(new Color(0, 0, 0));
