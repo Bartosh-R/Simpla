@@ -33,10 +33,11 @@ public class Extractor {
 	
 	public void define(String start, String stop)
 	{
-		System.out.println(myString.length());
 		int begin = myString.indexOf(start);
 		int end = myString.indexOf(stop,begin+start.length());
-		myString = myString.substring(begin,end);
+		
+		if(begin != -1 && end != -1) myString = myString.substring(begin,end);
+
 	}
 
 	

@@ -40,8 +40,7 @@ import dane.Interpreter;
 public class Main implements Runnable {
 	
 	//Address - translator database
-	static String url = "http://pl.bab.la/slownik/angielski-polski/";
-	static Interpreter inter = new Interpreter("settings.mod");
+	static Interpreter interpreter = new Interpreter("settings.mod");
 
 	// TrayIcon menu elements
 	public PopupMenu popup = new PopupMenu();
@@ -67,7 +66,6 @@ public class Main implements Runnable {
 		
 
 		setHotKeys();
-		
 	}
 	
 	
@@ -90,11 +88,13 @@ public class Main implements Runnable {
 	            if(id == 0)
 	            {
 	            	try {
+	            		
 	            		Selector foo = new Selector();
 	            		String select = URLEncoder.encode(Selector.go(foo), "UTF-8");
 	            		
-						inter.get(select);
-						ArrayList<String> elements = inter.result;
+	            		
+						interpreter.get(select);
+						ArrayList<String> elements = interpreter.result;
 						
 						
 						 tipWindow.setBackground(new Color(0, 0, 0));

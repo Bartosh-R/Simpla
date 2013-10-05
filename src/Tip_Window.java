@@ -6,17 +6,18 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 
 
-import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 import java.awt.geom.*;
-import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class Tip_Window extends JFrame implements MouseWheelListener{
 	
-	 Label display = new Label("Hakuna matata");
+	Label display = new Label("Hakuna matata");
    	Font font = new Font("Arial", Font.ITALIC, 35);
    	
    	 int cursor; // indicate current displayed translation
@@ -24,6 +25,8 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
    	 // contains informations about translations
    	ArrayList<String> elements;
    	String selection;
+   	
+   	boolean isEmpty = false;
    	  
     public Tip_Window() {
         super("SIMPLA");
@@ -46,11 +49,17 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
 
     }
     
-    public  void print(String s)
-    {
-    	System.out.print(s);
-    }
     
+    
+    
+    @Override
+	public void setVisible(boolean b) {
+		// TODO Auto-generated method stub
+    	if(isEmpty == false)super.setVisible(b);
+    	isEmpty = false;
+	}
+
+
     
     public void setInfo(ArrayList<String> elements, String selection)
     {
@@ -67,10 +76,26 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
     	}
     	else
     	{
+    		isEmpty = true;
     		display.setText("Nie Bangla");
+    		playSound();
     	}
 
     }
+    
+    public void playSound() {
+    
+    	      try {
+    	        Clip clip = AudioSystem.getClip();
+    	        AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+    	          Tip_Window.class.getResourceAsStream("msc/knock.wav"));
+    	        clip.open(inputStream);
+    	        clip.start(); 
+    	      } catch (Exception e) {
+    	        System.err.println(e.getMessage());
+    	      }
+    }
+   
 
     
     public void setDisplay()
@@ -208,7 +233,6 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		String message;
 		 int notches = e.getWheelRotation();
 	        if (notches < 0) {
 	        	//  mouse-up

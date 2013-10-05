@@ -11,7 +11,7 @@ public class Interpreter {
 
 	 File PATH = new File(Interpreter.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 	 String FILE_PATH = PATH.getAbsolutePath()+"\\";
-	
+	 
 	ArrayList<String> commands = new ArrayList<String>();
 	public static ArrayList<String> result = new ArrayList<String>();
 	static Extractor ext;
@@ -24,7 +24,7 @@ public class Interpreter {
 	
 	public void get(String word)
 	{
-		System.out.print(commands.get(0).replace("@", word));
+		System.out.println(commands.get(0).replace("@", word));
 		 ext = new Extractor(commands.get(0).replace("@", word), "UTF-8");
 			
 			//commands.remove(0);
