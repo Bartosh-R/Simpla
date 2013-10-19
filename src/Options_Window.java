@@ -1,10 +1,17 @@
 
 
+ 
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+
+
+
+
+
+
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
@@ -19,10 +26,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 
-public class Tip_Window extends JFrame implements MouseWheelListener{
+public class Options_Window extends JFrame implements MouseWheelListener{
 	
 	Label display = new Label("Hakuna matata");
    	Font font = new Font("Arial", Font.ITALIC, 35);
+   	
+   	Color white = new Color(255,255,255);
+   	Color yellow = new Color(255,234,0);
    	
    	// indicate current displayed translation
    	 int cursor; 
@@ -31,7 +41,7 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
    	ArrayList<String> elements;
    	
    	  
-    public Tip_Window() {
+    public Options_Window() {
         super("SIMPLA");
         setDisplay();
 
@@ -68,8 +78,9 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
     
     public void setInfo(ArrayList<String> elements)
     {
-    	//white color of new Tips
-    	 display.setForeground(new Color(255,255,255));
+    	//set color which depends on preferences
+    	String text = elements.get(cursor);
+    	 display.setForeground(text.compareTo(Main.getPreference("")) == 0? yellow : white);
     	
     	cursor = 0; // set on start
     	this.elements = elements;
@@ -134,7 +145,10 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
 					setVisible(false);
 					break;
 				case 3:
-					display.setForeground(new Color(255,234,0));
+					display.setForeground(yellow);
+					// Setting one true default file
+					Main.setPreference(elements.get(cursor)); 
+					Main.reload();
 					break;
 				default:
 					break;
@@ -237,19 +251,28 @@ public class Tip_Window extends JFrame implements MouseWheelListener{
 
         }
     }
-
+    
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		 int notches = e.getWheelRotation();
 	        if (notches < 0) {
 	        	//  mouse-up
 	           if(cursor < elements.size()-1)cursor++;
-	           display.setText(elements.get(cursor));
+	           String text = elements.get(cursor);
+	           
+	           display.setText(text);
+	           display.setForeground(text.compareTo(Main.getPreference("")) == 0? yellow : white);
+	           
+	           
 	           repaint();
 	        } else {
 	        //  mouse-down
 	        	if(cursor > 0)cursor--;
-		        display.setText(elements.get(cursor));
+	        	String text = elements.get(cursor);
+	        			
+		        display.setText(text);
+	        	display.setForeground(text.compareTo(Main.getPreference("")) == 0? yellow : white);
+	        
 		        repaint();
 	        }
 	}

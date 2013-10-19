@@ -8,66 +8,92 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
-import java.util.TimerTask;
-
+import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-
-import model.Record;
-
-
 
 import com.dstjacques.jhotkeys.JHotKeys;
 import com.dstjacques.jhotkeys.JHotKeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import com.sun.jna.platform.FileMonitor.FileListener;
+import com.sun.jna.platform.win32.Win32Exception;
 
 import dane.Interpreter;
-
 
 
 public class Main implements Runnable {
 	
 	//Address - translator database
-	static Interpreter interpreter = new Interpreter("settings.mod");
+	static Interpreter interpreter;
 
 	// TrayIcon menu elements
 	public PopupMenu popup = new PopupMenu();
-	public MenuItem addItem = new MenuItem("Add");
+	public MenuItem optItem = new MenuItem("Options");
     public MenuItem startItem = new MenuItem("Start");
     
     // Window
-	public static Ask_Window askWindow = new Ask_Window();
 	public static Tip_Window tipWindow = new Tip_Window();
+	public static Options_Window optionsWindow = new Options_Window();
     
 	//Engine Bruuum ....Bruum ;-)
     public Timer timer = new Timer( ); 
     public static Boolean is_run = false;
     
+    // Preferences 
+   static Preferences prefs;
+   static String NODENAME = "Simpla";
+   static String NAMEFILE = "NameFile";
+    
+   // List of File with instructions
+ 	public static String fileList[]; 
     
 	
 	public static void main(String[] args) {
 
 		final Main main = new Main();
 		SwingUtilities.invokeLater(main);
-		DataBase base = new DataBase();
 		
+		prefs = Preferences.userRoot().node(NODENAME);
+
+		seachForFiles();
+		showChooseDialog(new ArrayList<String>(Arrays.asList(fileList)));
 		
+		// search for saved file, if doesn't exist load fileList[0]
+		String defaultFile = getPreference(fileList[0]);
+		interpreter = new Interpreter(defaultFile);
 
 		setHotKeys();
 	}
 	
+	// Reload instruction file
+	
+	public static void reload()
+	{
+		String defaultFile = getPreference(fileList[0]);
+		interpreter = new Interpreter(defaultFile);
+	}
+	
+	// Preferences 
+	
+	  public static String getPreference(String deafult) {
+		    prefs = Preferences.userRoot().node(NODENAME);
+		    return prefs.get(NAMEFILE, deafult);
+		  }
+	  
+	  public static void setPreference(String deafult) {
+		    prefs = Preferences.userRoot().node(NODENAME);
+		     prefs.put(NAMEFILE, deafult);
+		  }
 	
 	// Main GUI elements 
 	
@@ -100,7 +126,7 @@ public class Main implements Runnable {
 						 tipWindow.setBackground(new Color(0, 0, 0));
 				         tipWindow.setOpacity(0.8f);
 				         
-						tipWindow.setInfo(elements,select);
+						tipWindow.setInfo(elements);
 						tipWindow.setVisible(true);
 
 						
@@ -114,28 +140,24 @@ public class Main implements Runnable {
 
 	      hotkeys.addHotKeyListener(hotkeyListener);
 	}
-	
+		
 	public void setMenu()
     {
-        popup.add(addItem);
+        popup.add(optItem);
         popup.add(startItem);
         
-        addItem.addActionListener(new ActionListener() {
+        optItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	Add_Window.go();
+            	
+        		seachForFiles();
+        		showChooseDialog(new ArrayList<String>(Arrays.asList(fileList)));
+        		
             }
         });
         
         startItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	if(!DataBase.Records.isEmpty())
-            	{
-            	startAsk();
-            	}
-            	else
-            	{
-            		//JOptionPane.showMessageDialog(Ask_Window., "You have to add cards");
-            	}
+            	
             }
         });
     }
@@ -169,47 +191,50 @@ public class Main implements Runnable {
         }
 	}
 	
+	//  Choose file option
 	
-
-	public void startAsk()
-	{
-		if(DataBase.Records.size() != 0)
-		{
-			if(is_run == false)
-			{
-			 askWindow.setBackground(new Color(0, 0, 0));
-             askWindow.setOpacity(0.8f);
-             askWindow.setVisible(true);
-             
-        	timer.schedule(new TimerTask() {
-			
-        		@Override
-        		public void run() {
-				System.out.println("ASK_WINDOW");
-				askWindow.display.setText(DataBase.getRandom().getQuestion());
-				askWindow.setVisible(true);
-        		}
-        		}, 0,5*60*1000);
-        		is_run = true;
-        		startItem.setLabel("Stop");
-				}
-				else
-				{
-					startItem.setLabel("Start");
-					timer.cancel();
-					timer = new Timer();
-					is_run = false;
-				}
+    public static void seachForFiles()
+    {
+   	 File PATH = new File(Interpreter.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+   	 
+    	fileList = PATH.list(new DirFiler(".*?.mod"));
+    	for(int i = 0; i < fileList.length; i++)
+    	{
+				System.out.print(fileList[i]+"\n");
+    	}
+    	
+    }
+    
+    static class DirFiler implements FilenameFilter
+    {
+    	private Pattern pat;
+    	
+    	public DirFiler(String regex) {
+    		pat = Pattern.compile(regex);
 		}
-	}
-	
+    	
+		@Override
+		public boolean accept(File dir, String name) {
+			return pat.matcher(name).matches();
+		}
+    	
+    }
+    
+    public static void showChooseDialog(ArrayList<String> list)
+    {
+		 optionsWindow.setBackground(new Color(0, 0, 0));
+		 optionsWindow.setOpacity(0.8f);
+         
+		 optionsWindow.setInfo(list);
+		 optionsWindow.setVisible(true);
+    }
+    
+    // Run this shit
+
 	@Override
 	public void run() {
 	      setMenu();
 	      setTray();
-	      
-	     // Start-up 
-	      startAsk();
 	}
 
 }
